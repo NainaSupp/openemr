@@ -30,7 +30,6 @@ require_once("$srcdir/report.inc");
 require_once("$srcdir/classes/Document.class.php");
 require_once("$srcdir/classes/Note.class.php");
 require_once("$srcdir/formatting.inc.php");
-include_once("$srcdir/formdata.inc.php");
 
 $startdate = $enddate = "";
 if(empty($_POST['start']) || empty($_POST['end'])) {
@@ -45,9 +44,8 @@ else {
 }
 //Patient related stuff
 if ($_POST["form_patient"])
-$form_patient = formData('form_patient','P');
-
-$form_pid = formData('form_pid','P');
+$form_patient = isset($_POST['form_patient']) ? $_POST['form_patient'] : '';
+$form_pid = isset($_POST['form_pid']) ? $_POST['form_pid'] : '';
 if ($form_patient == '' ) $form_pid = '';
 ?>
 <html>
@@ -163,7 +161,6 @@ if ($form_patient == '' ) $form_pid = '';
 // CapMinds :: callback by the find-patient popup.
  function setpatient(pid, lname, fname, dob) {
   var f = document.theform;
-	//alert(lname + ', ' + fname);
   f.form_patient.value = lname + ', ' + fname;
   f.form_pid.value = pid;
 
@@ -215,8 +212,8 @@ if ($form_patient == '' ) $form_pid = '';
 			&nbsp;&nbsp;<span class='text'><?php echo xlt('Patient'); ?>: </span>
 			</td>
 			<td>
-			<input type='text' size='20' name='form_patient' style='width:100%;cursor:pointer;cursor:hand' value='<?php echo text($form_patient) ? text($form_patient) : xlt('Click To Select'); ?>' onclick='sel_patient()' title='<?php echo xla('Click to select patient'); ?>' />
-			<input type='hidden' name='form_pid' value='<?php echo text($form_pid); ?>' />
+			<input type='text' size='20' name='form_patient' style='width:100%;cursor:pointer;cursor:hand' value='<?php echo attr($form_patient) ? attr($form_patient) : xla('Click To Select'); ?>' onclick='sel_patient()' title='<?php echo xla('Click to select patient'); ?>' />
+			<input type='hidden' name='form_pid' value='<?php echo attr($form_pid); ?>' />
 			</td>
 			</tr>
 			<tr><td>
@@ -274,13 +271,18 @@ if( !(empty($_POST['start']) || empty($_POST['end']))) {
 </p>
 <?php
     }
-
+		$sqlBindArray = array();
+		array_push($sqlBindArray,$startdate,$enddate);
+		
 		$res_query = 	"select * from forms where " .
                         "form_name = 'New Patient Encounter' and " .
-                        "date between '$startdate' and '$enddate' " ;
-		if($form_pid) {$res_query.= "and pid='$form_pid'";}	
+                        "date between ? and ? " ;
+		if($form_pid) {
+		$res_query.= "and pid=?";	
+		array_push($sqlBindArray,$form_pid);
+		}
         $res_query.=     "order by date DESC" ;
-		$res = sqlStatement($res_query); 
+		$res =sqlStatement($res_query,$sqlBindArray);
 	
     while($result = sqlFetchArray($res)) {
         if ($result{"form_name"} == "New Patient Encounter") {
