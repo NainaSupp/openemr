@@ -272,16 +272,15 @@ if( !(empty($_POST['start']) || empty($_POST['end']))) {
 <?php
     }
 		$sqlBindArray = array();
-		array_push($sqlBindArray,$startdate,$enddate);
-		
 		$res_query = 	"select * from forms where " .
                         "form_name = 'New Patient Encounter' and " .
                         "date between ? and ? " ;
+                array_push($sqlBindArray,$startdate,$enddate);
 		if($form_pid) {
-		$res_query.= "and pid=?";	
+		$res_query.= " and pid=? ";	
 		array_push($sqlBindArray,$form_pid);
 		}
-        $res_query.=     "order by date DESC" ;
+        $res_query.=     " order by date DESC" ;
 		$res =sqlStatement($res_query,$sqlBindArray);
 	
     while($result = sqlFetchArray($res)) {
@@ -359,10 +358,9 @@ if( !(empty($_POST['start']) || empty($_POST['end']))) {
                     echo "</td>\n";
                     echo "</tr>\n";
                     $total += $b['fee'];
-                    
-                      $copays = getPatientCopay($pids[$iCounter],$ta[1]);
-						
                 }
+            // Calculate the copay for the encounter
+            $copays = getPatientCopay($pids[$iCounter],$ta[1]);
             //}
             echo "<tr><td>&nbsp;</td></tr>";
             echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Sub-Total')."</td><td class='text'>" . oeFormatMoney($total + abs($copays)) . "</td></tr>";
