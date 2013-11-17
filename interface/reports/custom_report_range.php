@@ -363,9 +363,9 @@ if( !(empty($_POST['start']) || empty($_POST['end']))) {
             $copays = getPatientCopay($pids[$iCounter],$ta[1]);
             //}
             echo "<tr><td>&nbsp;</td></tr>";
-            echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Sub-Total')."</td><td class='text'>" . oeFormatMoney($total + abs($copays)) . "</td></tr>";
+            echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Sub-Total')."</td><td class='text'>" . oeFormatMoney($total) . "</td></tr>";
             echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Copay Paid')."</td><td class='text'>" . oeFormatMoney(abs($copays)) . "</td></tr>";
-            echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Total')."</td><td class='text'>" . oeFormatMoney($total) . "</td></tr>";
+            echo "<tr><td class='bold' colspan=3 style='text-align:right'>".xlt('Balance')."</td><td class='text'>" . oeFormatMoney($total - abs($copays)) . "</td></tr>";
             echo "</table>";
             echo "<pre>";
             //print_r($billings);
